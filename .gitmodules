@@ -1,3 +1,6 @@
 [submodule "mongo-singularity"]
 	path = mongo-singularity
 	url = git@github.com:jose-d/mongo-singularity.git
+[submodule "CCL-docker"]
+	path = CCL-docker
+	url = git@github.com:vrastil/CCL-docker.git
