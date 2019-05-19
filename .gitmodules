@@ -1,0 +1,3 @@
+[submodule "mongo-singularity"]
+	path = mongo-singularity
+	url = git@github.com:jose-d/mongo-singularity.git
