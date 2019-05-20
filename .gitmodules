@@ -4,3 +4,6 @@
 [submodule "CCL-docker"]
 	path = CCL-docker
 	url = git@github.com:vrastil/CCL-docker.git
+[submodule "FastSim-Container-Base"]
+	path = FastSim-Container-Base
+	url = git@github.com:vrastil/FastSim-Container-Base.git
