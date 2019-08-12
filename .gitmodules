@@ -7,3 +7,6 @@
 [submodule "FastSim-Container-Base"]
 	path = FastSim-Container-Base
 	url = git@github.com:vrastil/FastSim-Container-Base.git
+[submodule "Fast-Gadget-singularity"]
+	path = Fast-Gadget-singularity
+	url = git@github.com:vrastil/Fast-Gadget-singularity.git
