@@ -10,3 +10,6 @@
 [submodule "Fast-Gadget-singularity"]
 	path = Fast-Gadget-singularity
 	url = git@github.com:vrastil/Fast-Gadget-singularity.git
+[submodule "MP-Gadget-Singularity"]
+	path = MP-Gadget-Singularity
+	url = https://github.com/vrastil/MP-Gadget-Singularity.git
