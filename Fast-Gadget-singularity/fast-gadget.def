@@ -1,0 +1,43 @@
+BootStrap: library
+From: jose_d/default/debian9.6_hpc-openmpi21
+
+%help
+    Build Fast-Gadget
+
+%post
+    # get scientific libraries from package manager
+    apt-get -y install libgsl-dev libbz2-dev libhdf5-dev
+    
+    # data directory -- all building should be done here
+    export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+    NPROCESSES=65
+    mkdir /data
+
+    # get FFTW 2.1.5 -- single precision
+    cd /data/ && wget http://www.fftw.org/fftw-2.1.5.tar.gz && tar -xzf fftw-2.1.5.tar.gz && cd fftw-2.1.5/
+    ./configure --enable-mpi --enable-type-prefix --enable-float
+    make -j${NPROCESSES}
+    make install
+
+    # get FFTW 2.1.5 -- double precision
+    make clean
+    ./configure --enable-mpi --enable-type-prefix
+    make -j${NPROCESSES}
+    make install
+
+    # cleanup
+    cd /data/ && rm -rf *
+
+    # get N-GenIC
+    git clone https://github.com/vrastil/Fast-Gadget.git && cd Fast-Gadget/N-GenIC
+    make
+    make install
+
+    # get GADGET 2
+    cd ../Gadget-2.0.7/Gadget2
+    make
+    make install
+
+    # prepare workflow
+
+    # cleanup

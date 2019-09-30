@@ -1,0 +1,49 @@
+BootStrap: library
+From: jose_d/default/centos7_hpc_foss-2019a_gsl
+
+%help
+    Build and run MP-Gadget from within the container.
+
+%post
+    # suppress output
+    set +v && set +x 2>&1
+
+    # load necessary modules
+    echo "Loading modules..."
+    source /etc/profile.d/lmod.sh > /dev/null 2>&1
+    module use /opt/eb/modules/all > /dev/null 2>&1
+    module load foss
+    module load GSL
+
+    # data directory -- all building should be done here
+    mkdir /data && cd /data
+    NPROCESSES=16
+
+    # get MP-Gadget
+    echo "Cloning into repository..."
+    git clone https://github.com/vrastil/MP-Gadget.git > /dev/null 2>&1 && cd MP-Gadget
+    bash bootstrap.sh > /dev/null 2>&1
+    cp Options.mk.example Options.mk
+
+    # build MP-Gadget
+    echo "Building..."
+    make -j $NPROCESSES > /dev/null 2>&1
+    echo "Build finished successfully."
+
+    # install
+    cp genic/MP-GenIC /usr/local/bin/
+    cp gadget/MP-Gadget /usr/local/bin/
+
+    # get basic aliases and color prompt
+    cd /data && wget -O /data/.bashrc -o /dev/null https://raw.githubusercontent.com/vrastil/Containers/master/utils/.bashrc && chmod +x /data/.bashrc
+
+%environment
+    . /data/.bashrc
+
+%apprun genic
+    echo "Running MP-Genic from the container!"
+    MP-GenIC $@
+
+%apprun gadget
+    echo "Running MP-Gadget from the container!"
+    MP-Gadget $@
