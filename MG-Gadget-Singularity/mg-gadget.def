@@ -1,0 +1,80 @@
+BootStrap: library
+From: jose_d/default/centos7_hpc_foss-2019a_gsl
+
+%help
+    Build and run MG-Gadget from within the container.
+
+%post
+    ###########################
+    # SETUP
+    ###########################
+
+    # load necessary modules
+    echo "Loading modules..."
+    source /etc/profile.d/lmod.sh > /dev/null 2>&1
+    module use /opt/eb/modules/all > /dev/null 2>&1
+    module load foss
+    module rm FFTW
+
+    # data directory -- all building should be done here
+    mkdir /data && cd /data
+    NPROCESSES=64
+
+    ###########################
+    # FFTW
+    ###########################
+    FFTW_VERSION="2.1.5"
+    FFTW_DIR="fftw-${FFTW_VERSION}"
+    FFTW_TAR="${FFTW_DIR}.tar.gz"
+    FFTW_URL="http://www.fftw.org/${FFTW_TAR}"
+    FFTW_OPT="--enable-mpi --enable-openmp --enable-type-prefix"
+
+    # get FFTW single precision
+    cd /data/ && wget ${FFTW_URL} && tar -xzf ${FFTW_TAR} && cd ${FFTW_DIR}/
+    ./configure ${FFTW_OPT} --enable-float
+    make -j${NPROCESSES}
+    make install
+
+    # get FFTW double precision
+    make clean
+    ./configure ${FFTW_OPT} 
+    make -j${NPROCESSES}
+    make install
+
+    ###########################
+    # HDF5
+    ###########################
+    HDF5_VERSION="1.10.5"
+    HDF5_DIR="hdf5-${HDF5_VERSION}"
+    HDF5_TAR="${HDF5_DIR}.tar.gz"
+    HDF5_URL="https://support.hdfgroup.org/ftp/HDF5/current/src/${HDF5_TAR}"
+    HDF5_OPT="--enable-parallel --prefix=/usr/local/"
+
+    cd /data/ && wget ${HDF5_URL} && tar -xzf ${HDF5_TAR} && cd ${HDF5_DIR}/
+    ./configure ${HDF5_OPT}
+    make -j${NPROCESSES}
+    make install
+
+    ###########################
+    # Cleanup
+    ###########################
+    ldconfig
+    cd /data && rm -rf *
+
+    # get basic aliases and color prompt
+    cd /data && wget -O /data/.bashrc -o /dev/null https://raw.githubusercontent.com/vrastil/Containers/master/utils/.bashrc && chmod +x /data/.bashrc
+
+%environment
+    module load foss GSL
+    module rm FFTW
+    export CPATH="/usr/local/include/":$CPATH
+    export LD_LIBRARY_PATH="/usr/local/lib/":$LD_LIBRARY_PATH
+    export LIBRARY_PATH="/usr/local/lib/":$LIBRARY_PATH
+
+%apprun genic
+    echo "Running MP-Genic from the container!"
+    MP-GenIC $@
+
+%apprun gadget
+    echo "Running MP-Gadget from the container!"
+    MP-Gadget $@
